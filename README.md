@@ -1,8 +1,8 @@
 PostGIS extension for Doctrine
 ==============================
 
-[![Build Status](https://github.com/jsor/doctrine-postgis/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jsor/doctrine-postgis/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/jsor/doctrine-postgis/badge.svg?branch=main&service=github)](https://coveralls.io/github/jsor/doctrine-postgis?branch=main)
+This is a ad-hoc fork from [sasa-b/doctrine-spatial](https://github.com/sasa-b/doctrine-postgis) (originally forked from [jsor/doctrine-spatial](https://github.com/jsor/doctrine-postgis))
+meant to work the doctrine/dbal 3.7 version. Some tests still fail, I will look forward for them if I'll need the failing ST_* functions.
 
 This library allows you to use [Doctrine](https://www.doctrine-project.org/)
 (ORM or DBAL) with [PostGIS](https://postgis.net/), the spatial database
@@ -25,12 +25,12 @@ Supported Versions
 The following table shows the versions which are officially supported by this
 library.
 
-| Dependency    | Supported Versions  |
-|:--------------|:--------------------|
-| PostGIS       | 3.0 and 3.1         |
-| PostgreSQL    | 11, 12 and 13       |
-| Doctrine ORM  | ^2.9                |
-| Doctrine DBAL | ^2.13 and ^3.1      |
+| Dependency    | Supported Versions |
+|:--------------|:-------------------|
+| PostGIS       | 3.3                |
+| PostgreSQL    | 15                 |
+| Doctrine ORM  | ^2.17              |
+| Doctrine DBAL | ^3.7               |
 
 Installation
 --
