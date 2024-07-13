@@ -7,15 +7,17 @@ namespace Jsor\Doctrine\PostGIS;
 use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Events;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\ToolEvents;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
-use Jsor\Doctrine\PostGIS\Event\DBALSchemaEventSubscriber;
-use Jsor\Doctrine\PostGIS\Event\ORMSchemaEventSubscriber;
+use Jsor\Doctrine\PostGIS\Event\DBALSchemaDoctrineListener;
+use Jsor\Doctrine\PostGIS\Event\ORMSchemaDoctrineListener;
 use Jsor\Doctrine\PostGIS\Functions\Configurator;
 use Symfony\Bridge\Doctrine\SchemaListener\MessengerTransportDoctrineSchemaSubscriber;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection as MessengerConnection;
@@ -117,10 +119,19 @@ abstract class AbstractFunctionalTestCase extends AbstractTestCase
                 ),
             );
 
+            self::$_conn->getEventManager()->addEventListener([
+                Events::postConnect,
+                Events::onSchemaCreateTable,
+                Events::onSchemaColumnDefinition,
+                Events::onSchemaIndexDefinition,
+                Events::onSchemaAlterTable,
+                Events::onSchemaAlterTableChangeColumn,
+            ], new DBALSchemaDoctrineListener());
+
             if (class_exists(ORMConfiguration::class)) {
-                self::$_conn->getEventManager()->addEventSubscriber(new ORMSchemaEventSubscriber());
-            } else {
-                self::$_conn->getEventManager()->addEventSubscriber(new DBALSchemaEventSubscriber());
+                self::$_conn->getEventManager()->addEventListener([
+                    ToolEvents::postGenerateSchemaTable,
+                ], new ORMSchemaDoctrineListener());
             }
 
             if (!Type::hasType('tsvector')) {
@@ -145,7 +156,7 @@ abstract class AbstractFunctionalTestCase extends AbstractTestCase
         return self::$_messengerConn;
     }
 
-    protected function _getEntityManager(ORMConfiguration $config = null): EntityManager
+    protected function _getEntityManager(?ORMConfiguration $config = null): EntityManager
     {
         if (null !== $this->_em) {
             return $this->_em;
@@ -175,7 +186,7 @@ abstract class AbstractFunctionalTestCase extends AbstractTestCase
 
     protected function _setupConfiguration(ORMConfiguration $config): ORMConfiguration
     {
-        $config->setProxyDir(__DIR__ . '/tmp');
+        $config->setProxyDir(__DIR__.'/tmp');
         $config->setProxyNamespace('Proxy');
         $config->setMetadataDriverImpl($this->_getMappingDriver());
 
@@ -184,11 +195,11 @@ abstract class AbstractFunctionalTestCase extends AbstractTestCase
 
     protected function _getMappingDriver(): MappingDriver
     {
-        return new AttributeDriver([__DIR__ . '/fixtures/Entity']);
+        return new AttributeDriver([__DIR__.'/fixtures/Entity']);
     }
 
     protected function _execFile($fileName): int
     {
-        return $this->_getConnection()->executeStatement(file_get_contents(__DIR__ . '/fixtures/' . $fileName));
+        return $this->_getConnection()->executeStatement(file_get_contents(__DIR__.'/fixtures/'.$fileName));
     }
 }

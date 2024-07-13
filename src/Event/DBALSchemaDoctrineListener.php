@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jsor\Doctrine\PostGIS\Event;
 
-use Doctrine\Common\EventSubscriber;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\DBAL\Event\SchemaAlterTableChangeColumnEventArgs;
 use Doctrine\DBAL\Event\SchemaAlterTableEventArgs;
 use Doctrine\DBAL\Event\SchemaColumnDefinitionEventArgs;
@@ -20,25 +20,16 @@ use Jsor\Doctrine\PostGIS\Schema\SpatialIndexSqlGenerator;
 use Jsor\Doctrine\PostGIS\Types\GeographyType;
 use Jsor\Doctrine\PostGIS\Types\GeometryType;
 use Jsor\Doctrine\PostGIS\Types\PostGISType;
-use RuntimeException;
 
-use function count;
-
-class DBALSchemaEventSubscriber implements EventSubscriber
+#[AsDoctrineListener(event: Events::postConnect)]
+#[AsDoctrineListener(event: Events::onSchemaCreateTable)]
+#[AsDoctrineListener(event: Events::onSchemaColumnDefinition)]
+#[AsDoctrineListener(event: Events::onSchemaIndexDefinition)]
+#[AsDoctrineListener(event: Events::onSchemaAlterTable)]
+#[AsDoctrineListener(event: Events::onSchemaAlterTableChangeColumn)]
+class DBALSchemaDoctrineListener
 {
-    private const PROCESSING_TABLE_FLAG = self::class . ':processing';
-
-    public function getSubscribedEvents(): array
-    {
-        return [
-            Events::postConnect,
-            Events::onSchemaCreateTable,
-            Events::onSchemaColumnDefinition,
-            Events::onSchemaIndexDefinition,
-            Events::onSchemaAlterTable,
-            Events::onSchemaAlterTableChangeColumn,
-        ];
-    }
+    private const PROCESSING_TABLE_FLAG = self::class.':processing';
 
     public function postConnect(): void
     {
@@ -66,7 +57,7 @@ class DBALSchemaEventSubscriber implements EventSubscriber
             $table->dropIndex($index->getName());
         }
 
-        if (0 === count($spatialIndexes)) {
+        if (0 === \count($spatialIndexes)) {
             return;
         }
 
@@ -148,11 +139,11 @@ class DBALSchemaEventSubscriber implements EventSubscriber
         $table = new Identifier(false !== $diff->newName ? $diff->newName : $diff->name);
 
         if ($columnDiff->hasChanged('type')) {
-            throw new RuntimeException('The type of a spatial column cannot be changed (Requested changing type from "' . ($columnDiff->fromColumn?->getType()?->getName() ?? 'N/A') . '" to "' . $column->getType()->getName() . '" for column "' . $column->getName() . '" in table "' . $table->getName() . '")');
+            throw new \RuntimeException('The type of a spatial column cannot be changed (Requested changing type from "'.($columnDiff->fromColumn?->getType()?->getName() ?? 'N/A').'" to "'.$column->getType()->getName().'" for column "'.$column->getName().'" in table "'.$table->getName().'")');
         }
 
         if ($columnDiff->hasChanged('geometry_type')) {
-            throw new RuntimeException('The geometry_type of a spatial column cannot be changed (Requested changing type from "' . strtoupper((string) ($columnDiff->fromColumn?->getPlatformOption('geometry_type') ?? 'N/A')) . '" to "' . strtoupper((string) $column->getPlatformOption('geometry_type')) . '" for column "' . $column->getName() . '" in table "' . $table->getName() . '")');
+            throw new \RuntimeException('The geometry_type of a spatial column cannot be changed (Requested changing type from "'.strtoupper((string) ($columnDiff->fromColumn?->getPlatformOption('geometry_type') ?? 'N/A')).'" to "'.strtoupper((string) $column->getPlatformOption('geometry_type')).'" for column "'.$column->getName().'" in table "'.$table->getName().'")');
         }
 
         if ($columnDiff->hasChanged('srid')) {
@@ -186,9 +177,9 @@ class DBALSchemaEventSubscriber implements EventSubscriber
 
         $default = null;
 
-        if (isset($tableColumn['default']) &&
-            'NULL::geometry' !== $tableColumn['default'] &&
-            'NULL::geography' !== $tableColumn['default']) {
+        if (isset($tableColumn['default'])
+            && 'NULL::geometry' !== $tableColumn['default']
+            && 'NULL::geography' !== $tableColumn['default']) {
             $default = $tableColumn['default'];
         }
 

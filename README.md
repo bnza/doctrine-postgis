@@ -1,8 +1,10 @@
 PostGIS extension for Doctrine
 ==============================
 
-This is a ad-hoc fork from [sasa-b/doctrine-spatial](https://github.com/sasa-b/doctrine-postgis) (originally forked from [jsor/doctrine-spatial](https://github.com/jsor/doctrine-postgis))
-meant to work the doctrine/dbal 3.7 version. Some tests still fail, I will look forward for them if I'll need the failing ST_* functions.
+This is a ad-hoc fork from [sasa-b/doctrine-spatial](https://github.com/sasa-b/doctrine-postgis) (originally forked
+from [jsor/doctrine-spatial](https://github.com/jsor/doctrine-postgis))
+meant to work the doctrine/dbal 3.7 version. Some tests still fail, I will look forward for them if I'll need the
+failing ST_* functions.
 
 This library allows you to use [Doctrine](https://www.doctrine-project.org/)
 (ORM or DBAL) with [PostGIS](https://postgis.net/), the spatial database
@@ -11,7 +13,7 @@ extension for [PostgreSQL](https://www.postgresql.org/).
 * [Supported Versions](#supported-versions)
 * [Installation](#installation)
 * [Setup](#setup)
-  * [Symfony](#symfony)
+    * [Symfony](#symfony)
 * [Property Mapping](#property-mapping)
 * [Spatial Indexes](#spatial-indexes)
 * [Schema Tool](#schema-tool)
@@ -51,19 +53,20 @@ To use the library with the Doctrine ORM, register the
 `ORMSchemaEventSubscriber` event subscriber.
 
 ```php
-use Jsor\Doctrine\PostGIS\Event\ORMSchemaEventSubscriber;
+use Jsor\Doctrine\PostGIS\Event\ORMSchemaDoctrineListener;
 
-$entityManager->getEventManager()->addEventSubscriber(new ORMSchemaEventSubscriber());
+$entityManager->getEventManager()->addEventSubscriber(new ORMSchemaDoctrineListener());
 ```
 
 To use it with the DBAL only, register the `DBALSchemaEventSubscriber` event
 subscriber.
 
 ```php
-use Jsor\Doctrine\PostGIS\Event\DBALSchemaEventSubscriber;
+use Jsor\Doctrine\PostGIS\Event\DBALSchemaDoctrineListener;
 
-$connection->getEventManager()->addEventSubscriber(new DBALSchemaEventSubscriber());
+$connection->getEventManager()->addEventSubscriber(new DBALSchemaDoctrineListener());
 ```
+
 ### Symfony
 
 For integrating this library into a Symfony project, read the dedicated
@@ -95,10 +98,10 @@ class MyEntity
 There are 2 options to configure the geometry.
 
 * `geometry_type`
-   This defines the type of the geometry, like `POINT`, `LINESTRING` etc.
-   If you omit this option, the generic type `GEOMETRY` is used.
+  This defines the type of the geometry, like `POINT`, `LINESTRING` etc.
+  If you omit this option, the generic type `GEOMETRY` is used.
 * `srid`
-   This defines the Spatial Reference System Identifier (SRID) of the geometry.
+  This defines the Spatial Reference System Identifier (SRID) of the geometry.
 
 ### Example
 
@@ -177,15 +180,18 @@ class MyEntity
 Schema Tool
 --
 
-Full support for the [ORM Schema Tool](https://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/tools.html)
-and the [DBAL Schema Manager](https://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/schema-manager.html)
+Full support for
+the [ORM Schema Tool](https://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/tools.html)
+and
+the [DBAL Schema Manager](https://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/schema-manager.html)
 is provided.
 
 DQL Functions
 --
 
 Most [PostGIS functions](https://postgis.net/docs/reference.html) are also
-available for the [Doctrine Query Language](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html)
+available for
+the [Doctrine Query Language](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html)
 (DQL) under the `Jsor\Doctrine\PostGIS\Functions` namespace.
 
 For a full list of all supported functions, see the
@@ -195,7 +201,7 @@ For a full list of all supported functions, see the
 > how to configure the functions with Symfony.
 
 The functions must be registered with the `Doctrine\ORM\Configuration` instance.
- 
+
 ```php
 $configuration = new Doctrine\ORM\Configuration();
 
@@ -307,7 +313,7 @@ PHP container connected to specific database containers.
 The script names follow the pattern
 `run-<POSTGRESQL_VERSION>-<POSTGIS_VERSION>.sh`.
 
-To run the test suite against PostgreSQL 13 with PostGIS 3.1, use the script 
+To run the test suite against PostgreSQL 13 with PostGIS 3.1, use the script
 `./docker/run-13-31.sh`.
 
 ```bash
