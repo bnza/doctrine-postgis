@@ -8,7 +8,10 @@ namespace Jsor\Doctrine\PostGIS\Functions;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\AST\Node;
-use Doctrine\ORM\Query\Lexer;
+use Doctrine\ORM\Query\TokenType
+
+;
+
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
@@ -18,8 +21,10 @@ final class ST_GeometryFromText extends FunctionNode
 
     public function parse(Parser $parser): void
     {
-        $parser->match(Lexer::T_IDENTIFIER);
-        $parser->match(Lexer::T_OPEN_PARENTHESIS);
+        $parser->match(TokenType
+        ::
+        T_IDENTIFIER);
+        $parser->match(TokenType::T_OPEN_PARENTHESIS);
 
         $this->expressions[] = $parser->ArithmeticFactor();
 
@@ -28,12 +33,14 @@ final class ST_GeometryFromText extends FunctionNode
         /** @psalm-suppress DeprecatedMethod */
         $nextType = $lexer->lookahead['type'] ?? $lexer->lookahead->type ?? null;
 
-        if (Lexer::T_COMMA === $nextType) {
-            $parser->match(Lexer::T_COMMA);
+        if (TokenType::T_COMMA === $nextType) {
+        $parser->match(TokenType
+        ::
+        T_COMMA);
             $this->expressions[] = $parser->ArithmeticFactor();
         }
 
-        $parser->match(Lexer::T_CLOSE_PARENTHESIS);
+        $parser->match(TokenType::T_CLOSE_PARENTHESIS);
     }
 
     public function getSql(SqlWalker $sqlWalker): string
